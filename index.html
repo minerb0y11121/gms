@@ -1,833 +1,260 @@
-diff --git a/index.html b/index.html
-index 6cea78da5b15c68c5e1a1e98a209b7eb4f27e9c5..047478da9339926560dcbe4d924fe85eb90e4ce9 100644
---- a/index.html
-+++ b/index.html
-@@ -1,193 +1,635 @@
--<!DOCTYPE html>
--<html>
--<head>
--<title>GMS ULTRA ARCADE</title>
--<style>
--body {
--  margin: 0;
--  background: black;
--  color: white;
--  font-family: monospace;
--  text-align: center;
--}
--
--h1 { margin-top: 20px; }
--
--#searchBar {
--  padding: 10px;
--  width: 340px;
--  font-size: 16px;
--  margin: 20px;
--  border-radius: 6px;
--  border: none;
--}
--
--.games {
--  display: flex;
--  flex-wrap: wrap;
--  justify-content: center;
--}
--
--.game {
--  margin: 10px;
--  padding: 12px;
--  background: #111;
--  border-radius: 10px;
--  width: 220px;
--  transition: 0.2s;
--}
--
--.game:hover {
--  background: #1a1a1a;
--  transform: scale(1.05);
--}
--
--button {
--  padding: 8px 14px;
--  margin-top: 10px;
--  border: none;
--  background: lime;
--  color: black;
--  font-weight: bold;
--  cursor: pointer;
--  border-radius: 5px;
--}
--
--button:hover { background: #00ff88; }
--
--#passInput {
--  position: fixed;
--  bottom: 10px;
--  right: 10px;
--  background: black;
--  color: lime;
--  border: 1px solid lime;
--  padding: 6px;
--}
--
--#hackerConsole {
--  display: none;
--  position: fixed;
--  top: 0;
--  left: 0;
--  width: 100%;
--  height: 100%;
--  background: black;
--  color: lime;
--  padding: 20px;
--  overflow-y: auto;
--}
--
--#terminal {
--  text-align: left;
--  max-width: 900px;
--  margin: auto;
--}
--
--canvas {
--  position: fixed;
--  top: 0;
--  left: 0;
--  z-index: -1;
--}
--</style>
--</head>
--
--<body>
--
--<h1>🎮 GMS ULTRA ARCADE</h1>
--
--<input type="text" id="searchBar" placeholder="Search games..." onkeyup="searchGames()">
--
--<div class="games" id="gameContainer"></div>
--
--<input type="text" id="passInput" placeholder="Enter passcode...">
--
--<div id="hackerConsole">
--<h2>🔓 ACCESS GRANTED</h2>
--<div id="terminal"></div>
--<input type="text" id="commandInput" placeholder="Enter command...">
--</div>
--
--<canvas id="matrix"></canvas>
--
--<script>
--const gameFolders = [
--"1/","10-minutes-till-dawn/","100ng/","1v1lol/","1v1space/","2020-game/","2048-multitask/","2048/","8ball-billards-classic/","9007199254740992/","DogeMiner/","HexGL/","OfflineParadise/","Stickman-Survival/","achievementunlocked/","adarkroom/","adrenalinechallenge/","age-of-war/","alien-invaders-io/","alienhominid/","align-4/","among-us/","angry-birds/","anti-terrorist-rush/","arcade-wizard/","asciispace/","aspiring-artist/","asteroids/","astray/","avalanche/","awesome-tanks-2/","backcountry/","backflip-dive-3d/","backrooms/","bad-ice-cream-2/","bad-ice-cream-3/","bad-ice-cream/","baldis-basics/","basket-bros-io/","basketball-io/","basketball-legends-2020/","basketball-stars/","battleforgondor/","bigredbutton/","binding-of-isaac/","bitlife/","blacholesquare/","blackholesquare/","blackknight/","blocky-snakes/","bloonstd/","bloonstd2/","bloxors/","bounceback/","boxel-rebound/","boxhead2play/","brave-explorers/","breakingthebank/","breaklock/","breakout/","btd4/","btts/","burning-man-2/","cannon-basketball-4/","canyondefense/","captaincallisto/","cars-simulator/","cell-machine/","championarcher/","chess/","chill-radio/","chromaincident/","chrome-dino/","chromedino/","circlo/","city-blocks-2/","clean-up-io/","cluster-rush/","color-switch-2-challenges/","connect3/","cookie-clicker/","cookieclicker/","core-ball/","craftmine/","creativekillchamber/","crossyroad/","crowd city 2/","csgo-clicker/","ctr-holiday/","ctr-tr/","ctr/","cubefield/","cupcake2048/","cuttherope/","cuttherope2/","dadish/","dadish3/","dadishtwo/","dante/","deal-or-no-deal/","death-run-3d/","death-soul/","deathrun/","defend-the-tank/","dino/","doctor-acorn2/","dodge/","doge-miner-2/","doge-mining-simulator/","doge2048/","dont-drop-the-white-ball-2/","doodle-jump/","doublewires/","douchebag-workout-2/","dragon-vs-bricks/","draw-the-hill/","drive-mad/","duck-life-treasurehunt/","ducklife/","ducklife1/","ducklife2/","ducklife3/","ducklife4/"
--// YOU CAN CONTINUE PASTING THE REST HERE IF NEEDED
--];
--
--const container = document.getElementById("gameContainer");
--
--function formatTitle(slug) {
--  return slug.replace(/\//g,'')
--             .replace(/-/g,' ')
--             .replace(/\b\w/g, l => l.toUpperCase());
--}
--
--gameFolders.forEach(folder => {
--  const div = document.createElement("div");
--  div.className = "game";
--  div.setAttribute("data-name", folder);
--
--  div.innerHTML = `
--    <h3>${formatTitle(folder)}</h3>
--    <button onclick="openGame('${folder}')">Play</button>
--  `;
--
--  container.appendChild(div);
--});
--
--function openGame(folder){
--  window.open(folder, "_blank");
--}
--
--function searchGames(){
--  let input = document.getElementById("searchBar").value.toLowerCase();
--  let games = document.getElementsByClassName("game");
--  for(let i=0;i<games.length;i++){
--    let name = games[i].getAttribute("data-name").toLowerCase();
--    games[i].style.display = name.includes(input) ? "block" : "none";
--  }
--}
--
--/* PASSCODE */
--document.getElementById("passInput").addEventListener("keydown",function(e){
--if(e.key==="Enter"){
--if(this.value==="minerdabest"){
--document.getElementById("hackerConsole").style.display="block";
--startMatrix();
--boot();
--}else{
--alert("ACCESS DENIED");
--}
--}
--});
--
--/* TERMINAL */
--const terminal=document.getElementById("terminal");
--document.getElementById("commandInput").addEventListener("keydown",function(e){
--if(e.key==="Enter"){
--let cmd=this.value;
--terminal.innerHTML+="> "+cmd+"<br>";
--switch(cmd){
--case "help": terminal.innerHTML+="help clear files hack scan ip mine trace<br>"; break;
--case "clear": terminal.innerHTML=""; break;
--case "files": terminal.innerHTML+="root.key<br>wallet.dat<br>admin.log<br>"; break;
--case "hack": terminal.innerHTML+="Firewall bypassed.<br>Access complete.<br>"; break;
--case "scan": terminal.innerHTML+="Scanning... 12 devices found.<br>"; break;
--case "ip": terminal.innerHTML+="IP: 192.168."+Math.floor(Math.random()*255)+"."+Math.floor(Math.random()*255)+"<br>"; break;
--case "mine": terminal.innerHTML+="Mining crypto... "+Math.floor(Math.random()*10000)+" coins<br>"; break;
--case "trace": terminal.innerHTML+="Trace detected... Masked successfully.<br>"; break;
--default: terminal.innerHTML+="Unknown command<br>";
--}
--this.value="";
--}
--});
--
--/* BOOT */
--function boot(){
--terminal.innerHTML+="Initializing system...<br>";
--setTimeout(()=>terminal.innerHTML+="Connecting to darknet...<br>",500);
--setTimeout(()=>terminal.innerHTML+="Access granted.<br>",1000);
--}
-+<!DOCTYPE html>
-+<html>
-+<head>
-+<title>GMS Arcade</title>
-+
-+<style>
-+body {
-+  margin: 0;
-+  background: black;
-+  color: white;
-+  font-family: monospace;
-+  text-align: center;
-+}
-+
-+h1 {
-+  margin-top: 20px;
-+}
-+
-+#searchBar {
-+  padding: 10px;
-+  width: 320px;
-+  font-size: 16px;
-+  margin: 20px;
-+  border-radius: 6px;
-+  border: none;
-+}
-+
-+.games {
-+  display: flex;
-+  flex-wrap: wrap;
-+  justify-content: center;
-+}
-+
-+.game {
-+  margin: 12px;
-+  padding: 15px;
-+  background: #111;
-+  border-radius: 12px;
-+  width: 210px;
-+  transition: 0.3s;
-+  box-shadow: 0 0 10px #000;
-+}
-+
-+.game:hover {
-+  background: #1a1a1a;
-+  transform: scale(1.05);
-+}
-+
-+button {
-+  padding: 8px 15px;
-+  margin-top: 10px;
-+  border: none;
-+  background: lime;
-+  color: black;
-+  font-weight: bold;
-+  cursor: pointer;
-+  border-radius: 5px;
-+}
-+
-+button:hover {
-+  background: #00ff88;
-+}
-+
-+#passInput {
-+  position: fixed;
-+  bottom: 10px;
-+  right: 10px;
-+  background: black;
-+  color: lime;
-+  border: 1px solid lime;
-+  padding: 6px;
-+}
-+
-+#hackerConsole {
-+  display: none;
-+  position: fixed;
-+  top: 0;
-+  left: 0;
-+  width: 100%;
-+  height: 100%;
-+  background: black;
-+  color: lime;
-+  padding: 20px;
-+  overflow-y: auto;
-+}
-+
-+#terminal {
-+  text-align: left;
-+  max-width: 900px;
-+  margin: auto;
-+}
-+
-+canvas {
-+  position: fixed;
-+  top: 0;
-+  left: 0;
-+  z-index: -1;
-+}
-+</style>
-+</head>
-+
-+<body>
-+
-+<h1>🎮 GMS MEGA ARCADE</h1>
-+
-+<input type="text" id="searchBar" placeholder="Search games..." onkeyup="searchGames()">
-+
-+<div class="games" id="gameContainer"></div>
-+
-+<input type="text" id="passInput" placeholder="Enter passcode...">
-+
-+<div id="hackerConsole">
-+<h2>🔓 ACCESS GRANTED</h2>
-+<div id="terminal"></div>
-+<input type="text" id="commandInput" placeholder="Enter command...">
-+</div>
-+
-+<canvas id="matrix"></canvas>
-+
-+<script>
-+const games = [
-+  ["1", "1/"],
-+  ["10 Minutes Till Dawn", "10-minutes-till-dawn/"],
-+  ["100ng", "100ng/"],
-+  ["1v1lol", "1v1lol/"],
-+  ["1v1space", "1v1space/"],
-+  ["2020 Game", "2020-game/"],
-+  ["2048", "2048/"],
-+  ["2048 Multitask", "2048-multitask/"],
-+  ["8ball Billards Classic", "8ball-billards-classic/"],
-+  ["9007199254740992", "9007199254740992/"],
-+  ["Achievementunlocked", "achievementunlocked/"],
-+  ["Adarkroom", "adarkroom/"],
-+  ["Adrenalinechallenge", "adrenalinechallenge/"],
-+  ["Age Of War", "age-of-war/"],
-+  ["Alien Invaders Io", "alien-invaders-io/"],
-+  ["Alienhominid", "alienhominid/"],
-+  ["Align 4", "align-4/"],
-+  ["Among Us", "among-us/"],
-+  ["Angry Birds", "angry-birds/"],
-+  ["Anti Terrorist Rush", "anti-terrorist-rush/"],
-+  ["Arcade Wizard", "arcade-wizard/"],
-+  ["Asciispace", "asciispace/"],
-+  ["Aspiring Artist", "aspiring-artist/"],
-+  ["Asteroids", "asteroids/"],
-+  ["Astray", "astray/"],
-+  ["Avalanche", "avalanche/"],
-+  ["Awesome Tanks 2", "awesome-tanks-2/"],
-+  ["Backcountry", "backcountry/"],
-+  ["Backflip Dive 3d", "backflip-dive-3d/"],
-+  ["Backrooms", "backrooms/"],
-+  ["Bad Ice Cream", "bad-ice-cream/"],
-+  ["Bad Ice Cream 2", "bad-ice-cream-2/"],
-+  ["Bad Ice Cream 3", "bad-ice-cream-3/"],
-+  ["Baldis Basics", "baldis-basics/"],
-+  ["Basket Bros Io", "basket-bros-io/"],
-+  ["Basketball Io", "basketball-io/"],
-+  ["Basketball Legends 2020", "basketball-legends-2020/"],
-+  ["Basketball Stars", "basketball-stars/"],
-+  ["Battleforgondor", "battleforgondor/"],
-+  ["Bigredbutton", "bigredbutton/"],
-+  ["Binding Of Isaac", "binding-of-isaac/"],
-+  ["Bitlife", "bitlife/"],
-+  ["Blacholesquare", "blacholesquare/"],
-+  ["Blackholesquare", "blackholesquare/"],
-+  ["Blackknight", "blackknight/"],
-+  ["Blocky Snakes", "blocky-snakes/"],
-+  ["Bloonstd", "bloonstd/"],
-+  ["Bloonstd2", "bloonstd2/"],
-+  ["Bloxors", "bloxors/"],
-+  ["Bounceback", "bounceback/"],
-+  ["Boxel Rebound", "boxel-rebound/"],
-+  ["Boxhead2play", "boxhead2play/"],
-+  ["Brave Explorers", "brave-explorers/"],
-+  ["Breakingthebank", "breakingthebank/"],
-+  ["Breaklock", "breaklock/"],
-+  ["Breakout", "breakout/"],
-+  ["Btd4", "btd4/"],
-+  ["Btts", "btts/"],
-+  ["Burning Man 2", "burning-man-2/"],
-+  ["Cannon Basketball 4", "cannon-basketball-4/"],
-+  ["Canyondefense", "canyondefense/"],
-+  ["Captaincallisto", "captaincallisto/"],
-+  ["Cars Simulator", "cars-simulator/"],
-+  ["Cell Machine", "cell-machine/"],
-+  ["Championarcher", "championarcher/"],
-+  ["Chess", "chess/"],
-+  ["Chill Radio", "chill-radio/"],
-+  ["Chromaincident", "chromaincident/"],
-+  ["Chrome Dino", "chrome-dino/"],
-+  ["Chromedino", "chromedino/"],
-+  ["Circlo", "circlo/"],
-+  ["City Blocks 2", "city-blocks-2/"],
-+  ["Clean Up Io", "clean-up-io/"],
-+  ["Cluster Rush", "cluster-rush/"],
-+  ["Color Switch 2 Challenges", "color-switch-2-challenges/"],
-+  ["Connect3", "connect3/"],
-+  ["Cookie Clicker", "cookie-clicker/"],
-+  ["Cookieclicker", "cookieclicker/"],
-+  ["Core Ball", "core-ball/"],
-+  ["Craftmine", "craftmine/"],
-+  ["Creativekillchamber", "creativekillchamber/"],
-+  ["Crossyroad", "crossyroad/"],
-+  ["Crowd City 2", "crowd city 2/"],
-+  ["Csgo Clicker", "csgo-clicker/"],
-+  ["Ctr", "ctr/"],
-+  ["Ctr Holiday", "ctr-holiday/"],
-+  ["Ctr Tr", "ctr-tr/"],
-+  ["Cubefield", "cubefield/"],
-+  ["Cupcake2048", "cupcake2048/"],
-+  ["Cuttherope", "cuttherope/"],
-+  ["Cuttherope2", "cuttherope2/"],
-+  ["Dadish", "dadish/"],
-+  ["Dadish3", "dadish3/"],
-+  ["Dadishtwo", "dadishtwo/"],
-+  ["Dante", "dante/"],
-+  ["Deal Or No Deal", "deal-or-no-deal/"],
-+  ["Death Run 3d", "death-run-3d/"],
-+  ["Death Soul", "death-soul/"],
-+  ["Deathrun", "deathrun/"],
-+  ["Defend The Tank", "defend-the-tank/"],
-+  ["Dino", "dino/"],
-+  ["Doctor Acorn2", "doctor-acorn2/"],
-+  ["Dodge", "dodge/"],
-+  ["Doge Miner 2", "doge-miner-2/"],
-+  ["Doge Mining Simulator", "doge-mining-simulator/"],
-+  ["Doge2048", "doge2048/"],
-+  ["Dogeminer", "DogeMiner/"],
-+  ["Doodle Jump", "doodle-jump/"],
-+  ["Doublewires", "doublewires/"],
-+  ["Douchebag Workout 2", "douchebag-workout-2/"],
-+  ["Dragon Vs Bricks", "dragon-vs-bricks/"],
-+  ["Draw The Hill", "draw-the-hill/"],
-+  ["Drive Mad", "drive-mad/"],
-+  ["Duck Life Treasurehunt", "duck-life-treasurehunt/"],
-+  ["Ducklife", "ducklife/"],
-+  ["Ducklife1", "ducklife1/"],
-+  ["Ducklife2", "ducklife2/"],
-+  ["Ducklife3", "ducklife3/"],
-+  ["Ducklife4", "ducklife4/"],
-+  ["Duke Dashington Remastered", "duke-dashington-remastered/"],
-+  ["Dungeon Craft", "dungeon-craft/"],
-+  ["Edge Surf", "edge-surf/"],
-+  ["Edgenotfound", "edgenotfound/"],
-+  ["Elastic Face", "elastic-face/"],
-+  ["Elasticman", "elasticman/"],
-+  ["Emulator Js", "emulator-js/"],
-+  ["Endlesswar3", "endlesswar3/"],
-+  ["Escapingtheprison", "escapingtheprison/"],
-+  ["Evil Glitch", "evil-glitch/"],
-+  ["Evilglitch", "evilglitch/"],
-+  ["Evolution", "evolution/"],
-+  ["Exo", "exo/"],
-+  ["Factory Balls Forever", "factory-balls-forever/"],
-+  ["Factoryballs", "factoryballs/"],
-+  ["Factoryballsforever", "factoryballsforever/"],
-+  ["Fake Virus", "fake-virus/"],
-+  ["Fancypantsadventures", "fancypantsadventures/"],
-+  ["Fbwg", "fbwg/"],
-+  ["Finns Fantastic Food Machine", "finns-fantastic-food-machine/"],
-+  ["Fireboywatergirlforesttemple", "fireboywatergirlforesttemple/"],
-+  ["Fireice", "fireice/"],
-+  ["Firewater", "firewater/"],
-+  ["Flappy 2048", "flappy-2048/"],
-+  ["Flappy Bird", "flappy-bird/"],
-+  ["Flappy Defense", "flappy-defense/"],
-+  ["Flappybird", "flappybird/"],
-+  ["Flashtetris", "flashtetris/"],
-+  ["Flippy Fish", "flippy-fish/"],
-+  ["Flood Runner 2", "flood-runner-2/"],
-+  ["Fridaynightfunkin", "fridaynightfunkin/"],
-+  ["Friendlyfire", "friendlyfire/"],
-+  ["Froggys Battle", "froggys-battle/"],
-+  ["Fruitninja", "fruitninja/"],
-+  ["Frying Nemo", "frying-nemo/"],
-+  ["Game Inside", "game-inside/"],
-+  ["Generic Fishing Game", "generic-fishing-game/"],
-+  ["Geodash", "geodash/"],
-+  ["Geodash 2", "geodash-2/"],
-+  ["Geometry Jump Sketchy", "geometry_jump_sketchy/"],
-+  ["Geometrydash", "geometrydash/"],
-+  ["Georgeandtheprinter", "georgeandtheprinter/"],
-+  ["Getaway Shootout", "getaway-shootout/"],
-+  ["Getting Over It", "getting-over-it/"],
-+  ["Gimme The Airpod", "gimme-the-airpod/"],
-+  ["Glass City", "glass-city/"],
-+  ["Go Ball", "go-ball/"],
-+  ["Golf", "golf/"],
-+  ["Goodnight", "goodnight/"],
-+  ["Google Snake", "google-snake/"],
-+  ["Gopher", "gopher/"],
-+  ["Gravity Soccer", "gravity-soccer/"],
-+  ["Green", "green/"],
-+  ["Greybox", "greybox/"],
-+  ["Grindcraft", "grindcraft/"],
-+  ["Grow In The Hole", "grow-in-the-hole/"],
-+  ["Gun Mayhem", "gun-mayhem/"],
-+  ["Gun Mayhem 2", "gun-mayhem-2/"],
-+  ["Gun Mayhem Redux", "gun-mayhem-redux/"],
-+  ["Gunspin", "gunspin/"],
-+  ["Hackertype", "hackertype/"],
-+  ["Happy Hop", "happy-hop/"],
-+  ["Happy Wheels", "happy-wheels/"],
-+  ["Hba", "hba/"],
-+  ["Helicopter", "helicopter/"],
-+  ["Helios", "helios/"],
-+  ["Hexempire", "hexempire/"],
-+  ["Hexgl", "HexGL/"],
-+  ["Hextris", "hextris/"],
-+  ["House Of Hazards", "house-of-hazards/"],
-+  ["Icys Purple Head", "icys-purple-head/"],
-+  ["Idle Breakout", "idle-breakout/"],
-+  ["Idle Shark", "idle-shark/"],
-+  ["Impossiblequiz", "impossiblequiz/"],
-+  ["Interactivebuddy", "interactivebuddy/"],
-+  ["Iscribble Io", "iscribble-io/"],
-+  ["Jelly Truck", "jelly-truck/"],
-+  ["Jetpack", "jetpack/"],
-+  ["Jimothy Piggerton", "jimothy-piggerton/"],
-+  ["Just One Boss", "just-one-boss/"],
-+  ["Justfall", "justfall/"],
-+  ["Kart Fight Io", "kart-fight-io/"],
-+  ["Kitchen Gun Game", "kitchen-gun-game/"],
-+  ["Kittencannon", "kittencannon/"],
-+  ["Klocki", "klocki/"],
-+  ["Konnekt", "konnekt/"],
-+  ["Krunker", "krunker/"],
-+  ["Learntofly", "learntofly/"],
-+  ["Learntofly2", "learntofly2/"],
-+  ["Line Rider", "line-rider/"],
-+  ["Linquest", "linquest/"],
-+  ["Madalin Stunt Cars 2", "madalin-stunt-cars-2/"],
-+  ["Madalin Stunt Cars 3", "madalin-stunt-cars-3/"],
-+  ["Makeitmeme", "makeitmeme/"],
-+  ["Mario", "mario/"],
-+  ["Marvinspectrum", "marvinspectrum/"],
-+  ["Matrixrampage", "matrixrampage/"],
-+  ["Mc1.5.2", "mc1.5.2/"],
-+  ["Mcbeta0.30", "mcbeta0.30/"],
-+  ["Mcbeta1.3", "mcbeta1.3/"],
-+  ["Meat Boy", "meat-boy/"],
-+  ["Meme2048", "meme2048/"],
-+  ["Minecraft", "minecraft/"],
-+  ["Minecraft Classic", "minecraft-classic/"],
-+  ["Minecraftbeta", "minecraftbeta/"],
-+  ["Minesweeper", "minesweeper/"],
-+  ["Mini Stilts", "mini-stilts/"],
-+  ["Miniputt", "miniputt/"],
-+  ["Missiles", "missiles/"],
-+  ["Moto X3m 2", "moto-x3m-2/"],
-+  ["Moto X3m Pool Party", "moto-x3m-pool-party/"],
-+  ["Motox3m", "motox3m/"],
-+  ["Motox3m Pool", "motox3m-pool/"],
-+  ["Motox3m Spooky", "motox3m-spooky/"],
-+  ["Motox3m Winter", "motox3m-winter/"],
-+  ["Motox3m2", "motox3m2/"],
-+  ["Motox3mwinter", "motox3mwinter/"],
-+  ["My Friend Pedro", "my-friend-pedro/"],
-+  ["N Gon", "n-gon/"],
-+  ["Ninja", "ninja/"],
-+  ["Ninjavsevilcorp", "ninjavsevilcorp/"],
-+  ["Ns Shaft", "ns-shaft/"],
-+  ["Offlineparadise", "OfflineParadise/"],
-+  ["Om Bounce", "om-bounce/"],
-+  ["One Screen Run", "one-screen-run/"],
-+  ["One Screen Run 2", "one-screen-run-2/"],
-+  ["Osu", "osu/"],
-+  ["Ovo", "ovo/"],
-+  ["Packabunchas", "packabunchas/"],
-+  ["Pacman", "pacman/"],
-+  ["Pacman Fps", "pacman-fps/"],
-+  ["Pandemic2", "pandemic2/"],
-+  ["Papa Louie", "papa-louie/"],
-+  ["Papas Burgeria", "papas-burgeria/"],
-+  ["Papas Freezeria", "papas-freezeria/"],
-+  ["Papas Hot Doggeria", "papas-hot-doggeria/"],
-+  ["Papas Pancakeria", "papas-pancakeria/"],
-+  ["Papas Pizzeria", "papas-pizzeria/"],
-+  ["Papas Sushiria", "papas-sushiria/"],
-+  ["Papas Wingeria", "papas-wingeria/"],
-+  ["Papasburgeria", "papasburgeria/"],
-+  ["Papaspizzaria", "papaspizzaria/"],
-+  ["Paperio2", "paperio2/"],
-+  ["Papery Planes", "papery-planes/"],
-+  ["Particle Clicker", "particle-clicker/"],
-+  ["Particleclicker", "particleclicker/"],
-+  ["Path Finder", "path-finder/"],
-+  ["Pe Noire", "pe-noire/"],
-+  ["Pikwip", "pikwip/"],
-+  ["Pixel Cave", "pixel-cave/"],
-+  ["Pizzeria Simulator", "pizzeria-simulator/"],
-+  ["Polybranch", "polybranch/"],
-+  ["Popcat Classic", "popcat-classic/"],
-+  ["Portalflash", "portalflash/"],
-+  ["Precision Client", "precision-client/"],
-+  ["Protektor", "protektor/"],
-+  ["Push The Square", "push-the-square/"],
-+  ["Push Your Luck", "push-your-luck/"],
-+  ["Pushback", "pushback/"],
-+  ["Puzzle Ball", "puzzle-ball/"],
-+  ["Pvz 2", "pvz-2/"],
-+  ["Q1k3", "q1k3/"],
-+  ["Racer", "racer/"],
-+  ["Radiusraid", "radiusraid/"],
-+  ["Retro Bowl", "retro-bowl/"],
-+  ["Retrobowl", "retrobowl/"],
-+  ["Retrohaunt", "retrohaunt/"],
-+  ["Rise Of Neon Square", "rise-of-neon-square/"],
-+  ["Roadblocks", "roadblocks/"],
-+  ["Rocking Sky Trip", "rocking-sky-trip/"],
-+  ["Rolling Forests", "rolling-forests/"],
-+  ["Rolly Vortex", "rolly-vortex/"],
-+  ["Rooftop Snipers", "rooftop-snipers/"],
-+  ["Run 3", "run-3/"],
-+  ["Run3", "run3/"],
-+  ["Sand Game", "sand-game/"],
-+  ["Sandboxels", "sandboxels/"],
-+  ["Scrambled Eggs", "scrambled-eggs/"],
-+  ["Scrapmetal", "scrapmetal/"],
-+  ["Senya And Oscar 2", "senya-and-oscar-2/"],
-+  ["Sg", "sg/"],
-+  ["Shadow World Adventure", "shadow-world-adventure/"],
-+  ["Shards", "shards/"],
-+  ["Shift Flash", "shift-flash/"],
-+  ["Shift Flash 2", "shift-flash-2/"],
-+  ["Short Life 2", "short-life-2/"],
-+  ["Short Ride", "short-ride/"],
-+  ["Shuttledeck", "shuttledeck/"],
-+  ["Skyblock", "skyblock/"],
-+  ["Sleepingbeauty", "sleepingbeauty/"],
-+  ["Slice Of Sasha", "slice-of-sasha/"],
-+  ["Slither", "slither/"],
-+  ["Slither Snake", "slither snake/"],
-+  ["Slope", "slope/"],
-+  ["Slope Ball", "slope-ball/"],
-+  ["Slope2", "slope2/"],
-+  ["Sm63", "sm63/"],
-+  ["Sm64", "sm64/"],
-+  ["Smashkarts", "smashkarts/"],
-+  ["Smokingbarrels", "smokingbarrels/"],
-+  ["Snake", "snake/"],
-+  ["Snowbattle", "snowbattle/"],
-+  ["Soldier Legend", "soldier-legend/"],
-+  ["Solitaire", "solitaire/"],
-+  ["Sort The Court", "sort-the-court/"],
-+  ["Soundboard", "soundboard/"],
-+  ["Space Company", "space-company/"],
-+  ["Spacecompany", "spacecompany/"],
-+  ["Spacegarden", "spacegarden/"],
-+  ["Spacehuggers", "spacehuggers/"],
-+  ["Spelunky", "spelunky/"],
-+  ["Ssf", "ssf/"],
-+  ["Stack", "stack/"],
-+  ["Stack Bump 3d", "stack-bump-3d/"],
-+  ["Station 141", "station-141/"],
-+  ["Stealingthediamond", "stealingthediamond/"],
-+  ["Stick Archers Battle", "stick-archers-battle/"],
-+  ["Stickclimb", "stickclimb/"],
-+  ["Stickman", "stickman/"],
-+  ["Stickman Boost", "stickman-boost/"],
-+  ["Stickman Dismount", "stickman-dismount/"],
-+  ["Stickman Epic Battle", "stickman-epic-battle/"],
-+  ["Stickman Golf", "stickman-golf/"],
-+  ["Stickman Survival", "Stickman-Survival/"],
-+  ["Stickwar", "stickwar/"],
-+  ["Stormthehouse2", "stormthehouse2/"],
-+  ["Subway Surfers", "subway-surfers/"],
-+  ["Subway Surfers Bali", "subway-surfers-bali/"],
-+  ["Super Mario Maker Online", "super-mario-maker-online/"],
-+  ["Super Puffer Fish 3d", "super-puffer-fish-3d/"],
-+  ["Superhero Io", "superhero-io/"],
-+  ["Superhot", "superhot/"],
-+  ["Supermarioconstruct", "supermarioconstruct/"],
-+  ["Swerve", "swerve/"],
-+  ["Synesthesia", "synesthesia/"],
-+  ["Tactical Weapon Pack 2", "tactical-weapon-pack-2/"],
-+  ["Tacticalassasin2", "tacticalassasin2/"],
-+  ["Tail Of The Dragon", "tail-of-the-dragon/"],
-+  ["Tank Trouble 2", "tank-trouble-2/"],
-+  ["Tanuki Sunset", "tanuki-sunset/"],
-+  ["Temple Run 2", "temple-run-2/"],
-+  ["Tetris", "tetris/"],
-+  ["The Final Earth", "the-final-earth/"],
-+  ["The Final Earth 2", "the-final-earth-2/"],
-+  ["The Impossible Quiz", "the-impossible-quiz/"],
-+  ["The Impossible Quiz 2", "the-impossible-quiz-2/"],
-+  ["The Little Giant", "the-little-giant/"],
-+  ["Thebattle", "thebattle/"],
-+  ["Theheist", "theheist/"],
-+  ["Themazeofspacegoblins", "themazeofspacegoblins/"],
-+  ["There Is No Game", "there-is-no-game/"],
-+  ["Thisistheonlylevel", "thisistheonlylevel/"],
-+  ["Time Shooter 3", "time-shooter-3/"],
-+  ["Tiny Fishing", "tiny-fishing/"],
-+  ["Tiny Fragments", "tiny-fragments/"],
-+  ["Tiny Islands", "tiny-islands/"],
-+  ["Topple Adventure", "topple-adventure/"],
-+  ["Tosstheturtle", "tosstheturtle/"],
-+  ["Tough Growth", "tough-growth/"],
-+  ["Towermaster", "towermaster/"],
-+  ["Townscaper", "townscaper/"],
-+  ["Trimps", "trimps/"],
-+  ["Tube Jumpers", "tube-jumpers/"],
-+  ["Tunnel Rush", "tunnel-rush/"],
-+  ["Tunnelz", "tunnelz/"],
-+  ["Tv Static", "tv-static/"],
-+  ["Twitch Tetris", "twitch-tetris/"],
-+  ["Underrun", "underrun/"],
-+  ["Unfold 2", "unfold-2/"],
-+  ["Up Left Out", "up-left-out/"],
-+  ["Veloce", "veloce/"],
-+  ["Vex3", "vex3/"],
-+  ["Vex4", "vex4/"],
-+  ["Vex5", "vex5/"],
-+  ["Vex6", "vex6/"],
-+  ["Vex7", "vex7/"],
-+  ["Waterworks", "waterworks/"],
-+  ["Webretro", "webretro/"],
-+  ["Winter Falling Price", "winter-falling-price/"],
-+  ["Wipo", "wipo/"],
-+  ["Wolf3d", "wolf3d/"],
-+  ["Wordle", "wordle/"],
-+  ["Worlds Hardest Game", "worlds-hardest-game/"],
-+  ["Worlds Hardest Game 2", "worlds-hardest-game-2/"],
-+  ["X Trial Racing", "x-trial-racing/"],
-+  ["Xx142 B2exe", "xx142-b2exe/"],
-+  ["Yoshifabrication", "yoshifabrication/"],
-+  ["You Are Bezos", "you-are-bezos/"],
-+  ["Zig Zag", "zig-zag/"],
-+  ["Zombocalypse", "zombocalypse/"],
-+  ["Zombs Royale", "zombs-royale/"]
-+];
-+
-+const gameContainer = document.getElementById("gameContainer");
-+
-+for (const game of games) {
-+  const card = document.createElement("div");
-+  card.className = "game";
-+  card.setAttribute("data-name", game[0]);
-+  card.innerHTML = `<h3>${game[0]}</h3><button onclick="openGame('${game[1]}')">Play</button>`;
-+  gameContainer.appendChild(card);
-+}
-+
-+function openGame(url){
-+  window.open(url,"_blank");
-+}
-+
-+function searchGames(){
-+  let input = document.getElementById("searchBar").value.toLowerCase();
-+  let gameCards = document.getElementsByClassName("game");
-+  for(let i=0;i<gameCards.length;i++){
-+    let name = gameCards[i].getAttribute("data-name").toLowerCase();
-+    gameCards[i].style.display = name.includes(input) ? "block" : "none";
-+  }
-+}
-+
-+document.getElementById("passInput").addEventListener("keydown",function(e){
-+if(e.key==="Enter"){
-+if(this.value==="minerdabest"){
-+document.getElementById("hackerConsole").style.display="block";
-+startMatrix();
-+boot();
-+}else{
-+alert("ACCESS DENIED");
-+}
-+}
-+});
-+
-+const terminal=document.getElementById("terminal");
-+document.getElementById("commandInput").addEventListener("keydown",function(e){
-+if(e.key==="Enter"){
-+let cmd=this.value;
-+terminal.innerHTML+="> "+cmd+"<br>";
-+
-+switch(cmd){
-+case "help": terminal.innerHTML+="Commands: help, clear, files, hack, scan, ip, mine, trace<br>"; break;
-+case "clear": terminal.innerHTML=""; break;
-+case "files": terminal.innerHTML+="secret.txt<br>admin.log<br>wallet.dat<br>server.key<br>"; break;
-+case "hack": terminal.innerHTML+="Injecting exploit...<br>Bypassing firewall...<br>ACCESS COMPLETE<br>"; break;
-+case "scan": terminal.innerHTML+="Scanning network...<br>5 devices found<br>"; break;
-+case "ip": terminal.innerHTML+="IP Located: 192.168."+Math.floor(Math.random()*255)+"."+Math.floor(Math.random()*255)+"<br>"; break;
-+case "mine": terminal.innerHTML+="Mining crypto... "+Math.floor(Math.random()*9999)+" coins earned<br>"; break;
-+case "trace": terminal.innerHTML+="WARNING: TRACE DETECTED<br>Masking IP... Success<br>"; break;
-+default: terminal.innerHTML+="Unknown command<br>";
-+}
-+this.value="";
-+}
-+});
-+
-+function boot(){
-+terminal.innerHTML+="Initializing system...<br>";
-+setTimeout(()=>terminal.innerHTML+="Connecting to dark net...<br>",500);
-+setTimeout(()=>terminal.innerHTML+="Access granted.<br>",1000);
-+}
-+
-+function startMatrix(){
-+if (window.matrixStarted) return;
-+window.matrixStarted = true;
-+
-+const canvas=document.getElementById("matrix");
-+const ctx=canvas.getContext("2d");
-+canvas.height=window.innerHeight;
-+canvas.width=window.innerWidth;
-+
-+const letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-+const fontSize=14;
-+let columns=Math.floor(canvas.width/fontSize);
-+let drops=Array(columns).fill(1);
-+
-+window.addEventListener("resize",()=>{
-+canvas.height=window.innerHeight;
-+canvas.width=window.innerWidth;
-+columns=Math.floor(canvas.width/fontSize);
-+drops=Array(columns).fill(1);
-+});
-+
-+function draw(){
-+ctx.fillStyle="rgba(0,0,0,0.05)";
-+ctx.fillRect(0,0,canvas.width,canvas.height);
-+ctx.fillStyle="#0F0";
-+ctx.font=fontSize+"px monospace";
-+
-+for(let i=0;i<drops.length;i++){
-+const text=letters.charAt(Math.floor(Math.random()*letters.length));
-+ctx.fillText(text,i*fontSize,drops[i]*fontSize);
-+if(drops[i]*fontSize>canvas.height&&Math.random()>0.975) drops[i]=0;
-+drops[i]++;
-+}
-+}
-+setInterval(draw,33);
-+}
-+</script>
-+
-+</body>
-+</html>
+<!DOCTYPE html>
+<html>
+<head>
+<title>GMS Arcade</title>
+
+<style>
+body {
+  margin: 0;
+  background: black;
+  color: white;
+  font-family: monospace;
+  text-align: center;
+}
+
+h1 {
+  margin-top: 20px;
+}
+
+#searchBar {
+  padding: 10px;
+  width: 300px;
+  font-size: 16px;
+  margin: 20px;
+  border-radius: 5px;
+  border: none;
+}
+
+.games {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.game {
+  margin: 15px;
+  padding: 15px;
+  background: #111;
+  border-radius: 10px;
+  width: 200px;
+  transition: 0.3s;
+}
+
+.game:hover {
+  background: #1a1a1a;
+  transform: scale(1.05);
+}
+
+button {
+  padding: 8px 15px;
+  margin-top: 10px;
+  border: none;
+  background: lime;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+button:hover {
+  background: #00ff88;
+}
+
+#passInput {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  background: black;
+  color: lime;
+  border: 1px solid lime;
+  padding: 5px;
+}
+
+#hackerConsole {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  color: lime;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+#terminal {
+  text-align: left;
+  max-width: 800px;
+  margin: auto;
+}
+
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🎮 GMS Arcade</h1>
+
+<input type="text" id="searchBar" placeholder="Search games..." onkeyup="searchGames()">
+
+<div class="games" id="gameContainer">
+
+  <!-- ADD OR EDIT GAMES BELOW -->
+
+  <div class="game" data-name="Slope">
+    <h3>Slope</h3>
+    <button onclick="openGame('https://ubg365.github.io/slope/')">Play</button>
+  </div>
+
+  <div class="game" data-name="1v1 LOL">
+    <h3>1v1 LOL</h3>
+    <button onclick="openGame('https://ubg365.github.io/1v1lol/')">Play</button>
+  </div>
+
+  <div class="game" data-name="Run 3">
+    <h3>Run 3</h3>
+    <button onclick="openGame('https://ubg365.github.io/run3/')">Play</button>
+  </div>
+
+  <div class="game" data-name="Drift Hunters">
+    <h3>Drift Hunters</h3>
+    <button onclick="openGame('https://ubg365.github.io/drifthunters/')">Play</button>
+  </div>
+
+  <div class="game" data-name="Minecraft Classic">
+    <h3>Minecraft Classic</h3>
+    <button onclick="openGame('https://classic.minecraft.net/')">Play</button>
+  </div>
+
+  <div class="game" data-name="Tetris">
+    <h3>Tetris</h3>
+    <button onclick="openGame('https://tetris.com/play-tetris')">Play</button>
+  </div>
+
+</div>
+
+<input type="text" id="passInput" placeholder="Enter passcode...">
+
+<div id="hackerConsole">
+  <h2>🔓 ACCESS GRANTED</h2>
+  <div id="terminal"></div>
+  <input type="text" id="commandInput" placeholder="Enter command...">
+</div>
+
+<canvas id="matrix"></canvas>
+
+<script>
+function openGame(url) {
+  window.open(url, "_blank");
+}
+
+function searchGames() {
+  let input = document.getElementById("searchBar").value.toLowerCase();
+  let games = document.getElementsByClassName("game");
+
+  for (let i = 0; i < games.length; i++) {
+    let name = games[i].getAttribute("data-name").toLowerCase();
+    games[i].style.display = name.includes(input) ? "block" : "none";
+  }
+}
+
+// PASSCODE SYSTEM
+document.getElementById("passInput").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    if (this.value === "minerdabest") {
+      document.getElementById("hackerConsole").style.display = "block";
+      startMatrix();
+      bootSequence();
+    } else {
+      alert("ACCESS DENIED");
+    }
+  }
+});
+
+// HACKER TERMINAL
+const terminal = document.getElementById("terminal");
+document.getElementById("commandInput").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    let cmd = this.value;
+    terminal.innerHTML += "> " + cmd + "<br>";
+
+    if (cmd === "help") {
+      terminal.innerHTML += "Commands: help, clear, files, hack, ip, scan<br>";
+    }
+    else if (cmd === "clear") {
+      terminal.innerHTML = "";
+    }
+    else if (cmd === "files") {
+      terminal.innerHTML += "secret.txt<br>admin.log<br>crypto_wallet.dat<br>";
+    }
+    else if (cmd === "hack") {
+      terminal.innerHTML += "Bypassing firewall...<br>Injecting payload...<br>HACK SUCCESSFUL<br>";
+    }
+    else if (cmd === "ip") {
+      terminal.innerHTML += "IP Located: 192.168.0." + Math.floor(Math.random()*255) + "<br>";
+    }
+    else if (cmd === "scan") {
+      terminal.innerHTML += "Scanning network...<br>3 devices found<br>";
+    }
+    else {
+      terminal.innerHTML += "Unknown command<br>";
+    }
+
+    this.value = "";
+  }
+});
+
+// Boot animation
+function bootSequence() {
+  terminal.innerHTML += "Initializing system...<br>";
+  setTimeout(() => terminal.innerHTML += "Connecting to secure server...<br>", 500);
+  setTimeout(() => terminal.innerHTML += "Access granted.<br>", 1000);
+}
+
+// MATRIX EFFECT
+function startMatrix() {
+  const canvas = document.getElementById("matrix");
+  const ctx = canvas.getContext("2d");
+
+  canvas.height = window.innerHeight;
+  canvas.width = window.innerWidth;
+
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const fontSize = 14;
+  const columns = canvas.width / fontSize;
+  const drops = [];
+
+  for (let x = 0; x < columns; x++)
+    drops[x] = 1;
+
+  function draw() {
+    ctx.fillStyle = "rgba(0,0,0,0.05)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.fillStyle = "#0F0";
+    ctx.font = fontSize + "px monospace";
+
+    for (let i = 0; i < drops.length; i++) {
+      const text = letters.charAt(Math.floor(Math.random()*letters.length));
+      ctx.fillText(text, i*fontSize, drops[i]*fontSize);
+
+      if (drops[i]*fontSize > canvas.height && Math.random() > 0.975)
+        drops[i] = 0;
+
+      drops[i]++;
+    }
+  }
+
+  setInterval(draw, 33);
+}
+</script>
+
+</body>
+</html>

@@ -1759,7 +1759,7 @@ canvas {
 
 <script>
 function openGame(url) {
-  window.open(encodeURI(url), "_blank");
+  window.location.href = encodeURI(url);
 }
 
 function searchGames() {
@@ -1774,17 +1774,30 @@ function searchGames() {
 
 
 // PASSCODE SYSTEM
-document.getElementById("passInput").addEventListener("keydown", function(e) {
-  if (e.key === "Enter") {
-    if (this.value === "minerdabest") {
-      document.getElementById("hackerConsole").style.display = "block";
+const passInput = document.getElementById("passInput");
+let hasUnlockedConsole = false;
+
+function tryPasscodeUnlock() {
+  if (passInput.value.trim().toLowerCase() === "minerdabest") {
+    document.getElementById("hackerConsole").style.display = "block";
+
+    if (!hasUnlockedConsole) {
       startMatrix();
       bootSequence();
-    } else {
-      alert("ACCESS DENIED");
+      hasUnlockedConsole = true;
     }
+  } else {
+    alert("ACCESS DENIED");
+  }
+}
+
+passInput.addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    tryPasscodeUnlock();
   }
 });
+
+passInput.addEventListener("change", tryPasscodeUnlock);
 
 // HACKER TERMINAL
 const terminal = document.getElementById("terminal");

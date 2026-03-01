@@ -1,515 +1,244 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>gay ming</title>
+<title>GMS Arcade</title>
 <style>
-body{
-    background:#111;
-    color:white;
-    font-family:Arial;
-    text-align:center;
+body {
+  margin: 0;
+  background: #111;
+  color: white;
+  font-family: Arial, sans-serif;
+  text-align: center;
 }
-.game{
-    display:inline-block;
-    margin:15px;
-    padding:20px;
-    background:#222;
-    border-radius:12px;
-    text-decoration:none;
-    color:white;
-    transition:.2s;
+
+h1 {
+  padding: 20px;
 }
-.game:hover{
-    background:#444;
-    transform:scale(1.05);
+
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.game-card {
+  background: #222;
+  padding: 20px;
+  border-radius: 10px;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.game-card:hover {
+  background: #333;
+  transform: scale(1.05);
+}
+
+/* Secret input */
+.secret {
+  margin: 40px 0;
+}
+
+.secret input {
+  padding: 8px;
+}
+
+.secret button {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+/* Terminal */
+#terminalOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: black;
+  color: lime;
+  font-family: monospace;
+  z-index: 9999;
+  padding: 20px;
+  overflow: auto;
+}
+
+#terminalOutput {
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+#terminalInput {
+  background: black;
+  border: 1px solid lime;
+  color: lime;
+  padding: 5px;
+  width: 300px;
+}
+
+/* Matrix canvas */
+#matrixCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
 }
 </style>
 </head>
 
 <body>
 
-<h1>Games</h1>
+<canvas id="matrixCanvas"></canvas>
 
-<a class="game" href="2048/">Play 2048</a>
-<a class="game" href="cookie-clicker/">Cookie Clicker</a>
-<a class="game" href="chrome-dino/">Chrome Dino</a>
+<h1>🎮 GMS Arcade</h1>
 
-</body>
-</html>
-<!DOCTYPE html>
-<html>
-<head>
-<title>gay ming</title>
-<style>
-body{
-    background:#111;
-    color:white;
-    font-family:Arial;
-    text-align:center;
-    margin:0;
-    padding:20px;
-}
-#games{
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
-}
-.game{
-    display:inline-block;
-    margin:10px;
-    padding:16px 18px;
-    background:#222;
-    border-radius:12px;
-    text-decoration:none;
-    color:white;
-    transition:.2s;
-    min-width:180px;
-}
-.game:hover{
-    background:#444;
-    transform:scale(1.05);
-}
-</style>
-</head>
+<div class="game-grid">
+  <div class="game-card" onclick="alert('Game 1 placeholder')">Game 1</div>
+  <div class="game-card" onclick="alert('Game 2 placeholder')">Game 2</div>
+  <div class="game-card" onclick="alert('Game 3 placeholder')">Game 3</div>
+  <div class="game-card" onclick="alert('Game 4 placeholder')">Game 4</div>
+</div>
 
-<body>
+<div class="secret">
+  <input id="codeInput" placeholder="Enter Access Code">
+  <button onclick="unlock()">Unlock</button>
+</div>
 
-<h1>Games</h1>
-<div id="games"></div>
+<!-- Terminal Overlay -->
+<div id="terminalOverlay">
+  <div id="terminalOutput"></div>
+  <input id="terminalInput" placeholder="Type command..." onkeydown="handleCommand(event)">
+</div>
 
 <script>
-const games = [
-    "1/",
-    "10-minutes-till-dawn/",
-    "100ng/",
-    "1v1lol/",
-    "1v1space/",
-    "2020-game/",
-    "2048-multitask/",
-    "2048/",
-    "8ball-billards-classic/",
-    "9007199254740992/",
-    "DogeMiner/",
-    "HexGL/",
-    "OfflineParadise/",
-    "Stickman-Survival/",
-    "achievementunlocked/",
-    "adarkroom/",
-    "adrenalinechallenge/",
-    "age-of-war/",
-    "alien-invaders-io/",
-    "alienhominid/",
-    "align-4/",
-    "among-us/",
-    "angry-birds/",
-    "anti-terrorist-rush/",
-    "arcade-wizard/",
-    "asciispace/",
-    "aspiring-artist/",
-    "asteroids/",
-    "astray/",
-    "avalanche/",
-    "awesome-tanks-2/",
-    "backcountry/",
-    "backflip-dive-3d/",
-    "backrooms/",
-    "bad-ice-cream-2/",
-    "bad-ice-cream-3/",
-    "bad-ice-cream/",
-    "baldis-basics/",
-    "basket-bros-io/",
-    "basketball-io/",
-    "basketball-legends-2020/",
-    "basketball-stars/",
-    "battleforgondor/",
-    "bigredbutton/",
-    "binding-of-isaac/",
-    "bitlife/",
-    "blacholesquare/",
-    "blackholesquare/",
-    "blackknight/",
-    "blocky-snakes/",
-    "bloonstd/",
-    "bloonstd2/",
-    "bloxors/",
-    "bounceback/",
-    "boxel-rebound/",
-    "boxhead2play/",
-    "brave-explorers/",
-    "breakingthebank/",
-    "breaklock/",
-    "breakout/",
-    "btd4/",
-    "btts/",
-    "burning-man-2/",
-    "cannon-basketball-4/",
-    "canyondefense/",
-    "captaincallisto/",
-    "cars-simulator/",
-    "cell-machine/",
-    "championarcher/",
-    "chess/",
-    "chill-radio/",
-    "chromaincident/",
-    "chrome-dino/",
-    "chromedino/",
-    "circlo/",
-    "city-blocks-2/",
-    "clean-up-io/",
-    "cluster-rush/",
-    "color-switch-2-challenges/",
-    "connect3/",
-    "cookie-clicker/",
-    "cookieclicker/",
-    "core-ball/",
-    "craftmine/",
-    "creativekillchamber/",
-    "crossyroad/",
-    "crowd city 2/",
-    "csgo-clicker/",
-    "ctr-holiday/",
-    "ctr-tr/",
-    "ctr/",
-    "cubefield/",
-    "cupcake2048/",
-    "cuttherope/",
-    "cuttherope2/",
-    "dadish/",
-    "dadish3/",
-    "dadishtwo/",
-    "dante/",
-    "deal-or-no-deal/",
-    "death-run-3d/",
-    "death-soul/",
-    "deathrun/",
-    "defend-the-tank/",
-    "dino/",
-    "doctor-acorn2/",
-    "dodge/",
-    "doge-miner-2/",
-    "doge-mining-simulator/",
-    "doge2048/",
-    "dont-drop-the-white-ball-2/",
-    "doodle-jump/",
-    "doublewires/",
-    "douchebag-workout-2/",
-    "dragon-vs-bricks/",
-    "draw-the-hill/",
-    "drive-mad/",
-    "duck-life-treasurehunt/",
-    "ducklife/",
-    "ducklife1/",
-    "ducklife2/",
-    "ducklife3/",
-    "ducklife4/",
-    "duke-dashington-remastered/",
-    "dungeon-craft/",
-    "edge-surf/",
-    "edgenotfound/",
-    "elastic-face/",
-    "elasticman/",
-    "emulator-js/",
-    "endlesswar3/",
-    "escapingtheprison/",
-    "evil-glitch/",
-    "evilglitch/",
-    "evolution/",
-    "exo/",
-    "factory-balls-forever/",
-    "factoryballs/",
-    "factoryballsforever/",
-    "fake-virus/",
-    "fancypantsadventures/",
-    "fbwg/",
-    "finns-fantastic-food-machine/",
-    "fireboywatergirlforesttemple/",
-    "fireice/",
-    "firewater/",
-    "flappy-2048/",
-    "flappy-bird/",
-    "flappy-defense/",
-    "flappybird/",
-    "flashtetris/",
-    "flippy-fish/",
-    "flood-runner-2/",
-    "fridaynightfunkin/",
-    "friendlyfire/",
-    "froggys-battle/",
-    "fruitninja/",
-    "frying-nemo/",
-    "game-inside/",
-    "generic-fishing-game/",
-    "geodash-2/",
-    "geodash/",
-    "geometry_jump_sketchy/",
-    "geometrydash/",
-    "georgeandtheprinter/",
-    "getaway-shootout/",
-    "getting-over-it/",
-    "gimme-the-airpod/",
-    "glass-city/",
-    "go-ball/",
-    "golf/",
-    "goodnight/",
-    "google-snake/",
-    "gopher/",
-    "gravity-soccer/",
-    "green/",
-    "greybox/",
-    "grindcraft/",
-    "grow-in-the-hole/",
-    "gun-mayhem-2/",
-    "gun-mayhem-redux/",
-    "gun-mayhem/",
-    "gunspin/",
-    "hackertype/",
-    "happy-hop/",
-    "happy-wheels/",
-    "hba/",
-    "helicopter/",
-    "helios/",
-    "hexempire/",
-    "hextris/",
-    "house-of-hazards/",
-    "icys-purple-head/",
-    "idle-breakout/",
-    "idle-shark/",
-    "impossiblequiz/",
-    "interactivebuddy/",
-    "iscribble-io/",
-    "jelly-truck/",
-    "jetpack/",
-    "jimothy-piggerton/",
-    "just-one-boss/",
-    "justfall/",
-    "kart-fight-io/",
-    "kitchen-gun-game/",
-    "kittencannon/",
-    "klocki/",
-    "konnekt/",
-    "krunker/",
-    "learntofly/",
-    "learntofly2/",
-    "line-rider/",
-    "linquest/",
-    "madalin-stunt-cars-2/",
-    "madalin-stunt-cars-3/",
-    "makeitmeme/",
-    "mario/",
-    "marvinspectrum/",
-    "matrixrampage/",
-    "mc1.5.2/",
-    "mcbeta0.30/",
-    "mcbeta1.3/",
-    "meat-boy/",
-    "meme2048/",
-    "minecraft-classic/",
-    "minecraft/",
-    "minecraftbeta/",
-    "minesweeper/",
-    "mini-stilts/",
-    "miniputt/",
-    "missiles/",
-    "moto-x3m-2/",
-    "moto-x3m-pool-party/",
-    "motox3m-pool/",
-    "motox3m-spooky/",
-    "motox3m-winter/",
-    "motox3m/",
-    "motox3m2/",
-    "motox3mwinter/",
-    "my-friend-pedro/",
-    "n-gon/",
-    "ninja/",
-    "ninjavsevilcorp/",
-    "ns-shaft/",
-    "om-bounce/",
-    "one-screen-run-2/",
-    "one-screen-run/",
-    "osu/",
-    "ovo/",
-    "packabunchas/",
-    "pacman-fps/",
-    "pacman/",
-    "pandemic2/",
-    "papa-louie/",
-    "papas-burgeria/",
-    "papas-freezeria/",
-    "papas-hot-doggeria/",
-    "papas-pancakeria/",
-    "papas-pizzeria/",
-    "papas-sushiria/",
-    "papas-wingeria/",
-    "papasburgeria/",
-    "papaspizzaria/",
-    "paperio2/",
-    "papery-planes/",
-    "particle-clicker/",
-    "particleclicker/",
-    "path-finder/",
-    "pe-noire/",
-    "pikwip/",
-    "pixel-cave/",
-    "pizzeria-simulator/",
-    "polybranch/",
-    "popcat-classic/",
-    "portalflash/",
-    "precision-client/",
-    "protektor/",
-    "push-the-square/",
-    "push-your-luck/",
-    "pushback/",
-    "puzzle-ball/",
-    "pvz-2/",
-    "q1k3/",
-    "racer/",
-    "radiusraid/",
-    "retro-bowl/",
-    "retrobowl/",
-    "retrohaunt/",
-    "rise-of-neon-square/",
-    "roadblocks/",
-    "rocking-sky-trip/",
-    "rolling-forests/",
-    "rolly-vortex/",
-    "rooftop-snipers/",
-    "run-3/",
-    "run3/",
-    "sand-game/",
-    "sandboxels/",
-    "scrambled-eggs/",
-    "scrapmetal/",
-    "senya-and-oscar-2/",
-    "sg/",
-    "shadow-world-adventure/",
-    "shards/",
-    "shift-flash-2/",
-    "shift-flash/",
-    "short-life-2/",
-    "short-ride/",
-    "shuttledeck/",
-    "skyblock/",
-    "sleepingbeauty/",
-    "slice-of-sasha/",
-    "slither snake/",
-    "slither/",
-    "slope-ball/",
-    "slope/",
-    "slope2/",
-    "sm63/",
-    "sm64/",
-    "smashkarts/",
-    "smokingbarrels/",
-    "snake/",
-    "snowbattle/",
-    "soldier-legend/",
-    "solitaire/",
-    "sort-the-court/",
-    "soundboard/",
-    "space-company/",
-    "spacecompany/",
-    "spacegarden/",
-    "spacehuggers/",
-    "spelunky/",
-    "ssf/",
-    "stack-bump-3d/",
-    "stack/",
-    "station-141/",
-    "stealingthediamond/",
-    "stick-archers-battle/",
-    "stickclimb/",
-    "stickman-boost/",
-    "stickman-dismount/",
-    "stickman-epic-battle/",
-    "stickman-golf/",
-    "stickman/",
-    "stickwar/",
-    "stormthehouse2/",
-    "subway-surfers-bali/",
-    "subway-surfers/",
-    "super-mario-maker-online/",
-    "super-puffer-fish-3d/",
-    "superhero-io/",
-    "superhot/",
-    "supermarioconstruct/",
-    "swerve/",
-    "synesthesia/",
-    "tactical-weapon-pack-2/",
-    "tacticalassasin2/",
-    "tail-of-the-dragon/",
-    "tam-indian-truck-simulator-3d/",
-    "tank-trouble-2/",
-    "tanuki-sunset/",
-    "temple-run-2/",
-    "tetris/",
-    "the-final-earth-2/",
-    "the-final-earth/",
-    "the-impossible-quiz-2/",
-    "the-impossible-quiz/",
-    "the-little-giant/",
-    "thebattle/",
-    "theheist/",
-    "themazeofspacegoblins/",
-    "there-is-no-game/",
-    "thisistheonlylevel/",
-    "time-shooter-3/",
-    "tiny-fishing/",
-    "tiny-fragments/",
-    "tiny-islands/",
-    "topple-adventure/",
-    "tosstheturtle/",
-    "tough-growth/",
-    "towermaster/",
-    "townscaper/",
-    "trimps/",
-    "tube-jumpers/",
-    "tunnel-rush/",
-    "tunnelz/",
-    "tv-static/",
-    "twitch-tetris/",
-    "underrun/",
-    "unfold-2/",
-    "up-left-out/",
-    "veloce/",
-    "vex3/",
-    "vex4/",
-    "vex5/",
-    "vex6/",
-    "vex7/",
-    "waterworks/",
-    "webretro/",
-    "winter-falling-price/",
-    "wipo/",
-    "wolf3d/",
-    "wordle/",
-    "worlds-hardest-game-2/",
-    "worlds-hardest-game/",
-    "x-trial-racing/",
-    "xx142-b2exe/",
-    "yoshifabrication/",
-    "you-are-bezos/",
-    "zig-zag/",
-    "zombocalypse/",
-    "zombs-royale/",
-];
+// ================== SECRET UNLOCK ==================
 
-function formatGameName(path) {
-    return path
-        .replace(/\/$/, "")
-        .replace(/[-_]/g, " ")
-        .split(" ")
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" ");
+function unlock() {
+  const code = document.getElementById("codeInput").value;
+
+  if (code === "shadow1337") {
+    localStorage.setItem("terminalUnlocked", "true");
+    openTerminal();
+  } else {
+    alert("Access Denied");
+  }
 }
 
-const container = document.getElementById("games");
-games.forEach((path) => {
-    const link = document.createElement("a");
-    link.className = "game";
-    link.href = path;
-    link.textContent = `Play ${formatGameName(path)}`;
-    container.appendChild(link);
-});
+function openTerminal() {
+  if (localStorage.getItem("terminalUnlocked") === "true") {
+    document.getElementById("terminalOverlay").style.display = "block";
+    startBootSequence();
+  }
+}
+
+// ================== BOOT SEQUENCE ==================
+
+function startBootSequence() {
+  const output = document.getElementById("terminalOutput");
+  const text = `
+Initializing system...
+Connecting to secure network...
+Bypassing firewall...
+Decrypting credentials...
+ACCESS GRANTED.
+
+Welcome, Agent.
+Type 'help' for commands.
+`;
+
+  let i = 0;
+  output.innerHTML = "";
+
+  function type() {
+    if (i < text.length) {
+      output.innerHTML += text.charAt(i);
+      i++;
+      setTimeout(type, 25);
+    }
+  }
+  type();
+}
+
+// ================== COMMAND SYSTEM ==================
+
+function handleCommand(e) {
+  if (e.key === "Enter") {
+    const input = document.getElementById("terminalInput");
+    const cmd = input.value.trim().toLowerCase();
+    const output = document.getElementById("terminalOutput");
+
+    output.innerHTML += "\n> " + cmd + "\n";
+
+    switch (cmd) {
+      case "help":
+        output.innerHTML += "Commands:\nhelp\nscan\ntrace\nclear\nexit\n";
+        break;
+
+      case "scan":
+        output.innerHTML += "Scanning network...\nIP Found: 192.168.0." + Math.floor(Math.random()*255) + "\n";
+        break;
+
+      case "trace":
+        output.innerHTML += "Tracing signal...\nLocation: UNKNOWN\n";
+        break;
+
+      case "clear":
+        output.innerHTML = "";
+        break;
+
+      case "exit":
+        document.getElementById("terminalOverlay").style.display = "none";
+        break;
+
+      default:
+        output.innerHTML += "Unknown command.\n";
+    }
+
+    output.scrollTop = output.scrollHeight;
+    input.value = "";
+  }
+}
+
+// ================== MATRIX RAIN ==================
+
+const canvas = document.getElementById("matrixCanvas");
+const ctx = canvas.getContext("2d");
+
+canvas.height = window.innerHeight;
+canvas.width = window.innerWidth;
+
+const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const fontSize = 14;
+const columns = canvas.width / fontSize;
+
+const drops = [];
+for (let x = 0; x < columns; x++) {
+  drops[x] = 1;
+}
+
+function drawMatrix() {
+  ctx.fillStyle = "rgba(0,0,0,0.05)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = "lime";
+  ctx.font = fontSize + "px monospace";
+
+  for (let i = 0; i < drops.length; i++) {
+    const text = letters.charAt(Math.floor(Math.random() * letters.length));
+    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975)
+      drops[i] = 0;
+
+    drops[i]++;
+  }
+}
+
+setInterval(drawMatrix, 33);
+
+// Resize support
+window.onresize = () => {
+  canvas.height = window.innerHeight;
+  canvas.width = window.innerWidth;
+};
 </script>
 
 </body>

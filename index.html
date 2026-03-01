@@ -1,84 +1,93 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>GMS Arcade</title>
+<title>GMS ULTRA ARCADE</title>
 <style>
 body {
   margin: 0;
-  background: #111;
+  background: black;
   color: white;
-  font-family: Arial, sans-serif;
+  font-family: monospace;
   text-align: center;
 }
 
-h1 {
-  padding: 20px;
+h1 { margin-top: 20px; }
+
+#searchBar {
+  padding: 10px;
+  width: 340px;
+  font-size: 16px;
+  margin: 20px;
+  border-radius: 6px;
+  border: none;
 }
 
-.game-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  padding: 20px;
+.games {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-.game-card {
-  background: #222;
-  padding: 20px;
+.game {
+  margin: 10px;
+  padding: 12px;
+  background: #111;
   border-radius: 10px;
+  width: 220px;
   transition: 0.2s;
-  cursor: pointer;
 }
 
-.game-card:hover {
-  background: #333;
+.game:hover {
+  background: #1a1a1a;
   transform: scale(1.05);
 }
 
-/* Secret input */
-.secret {
-  margin: 40px 0;
-}
-
-.secret input {
-  padding: 8px;
-}
-
-.secret button {
-  padding: 8px 12px;
+button {
+  padding: 8px 14px;
+  margin-top: 10px;
+  border: none;
+  background: lime;
+  color: black;
+  font-weight: bold;
   cursor: pointer;
+  border-radius: 5px;
 }
 
-/* Terminal */
-#terminalOverlay {
+button:hover { background: #00ff88; }
+
+#passInput {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  background: black;
+  color: lime;
+  border: 1px solid lime;
+  padding: 6px;
+}
+
+#hackerConsole {
   display: none;
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background: black;
   color: lime;
-  font-family: monospace;
-  z-index: 9999;
   padding: 20px;
-  overflow: auto;
+  overflow-y: auto;
 }
 
-#terminalOutput {
-  white-space: pre-wrap;
-  margin-bottom: 20px;
+#terminal {
+  text-align: left;
+  max-width: 900px;
+  margin: auto;
 }
 
-#terminalInput {
-  background: black;
-  border: 1px solid lime;
-  color: lime;
-  padding: 5px;
-  width: 300px;
-}
-
-/* Matrix canvas */
-#matrixCanvas {
+canvas {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
   z-index: -1;
 }
 </style>
@@ -86,160 +95,99 @@ h1 {
 
 <body>
 
-<canvas id="matrixCanvas"></canvas>
+<h1>🎮 GMS ULTRA ARCADE</h1>
 
-<h1>🎮 GMS Arcade</h1>
+<input type="text" id="searchBar" placeholder="Search games..." onkeyup="searchGames()">
 
-<div class="game-grid">
-  <div class="game-card" onclick="alert('Game 1 placeholder')">Game 1</div>
-  <div class="game-card" onclick="alert('Game 2 placeholder')">Game 2</div>
-  <div class="game-card" onclick="alert('Game 3 placeholder')">Game 3</div>
-  <div class="game-card" onclick="alert('Game 4 placeholder')">Game 4</div>
+<div class="games" id="gameContainer"></div>
+
+<input type="text" id="passInput" placeholder="Enter passcode...">
+
+<div id="hackerConsole">
+<h2>🔓 ACCESS GRANTED</h2>
+<div id="terminal"></div>
+<input type="text" id="commandInput" placeholder="Enter command...">
 </div>
 
-<div class="secret">
-  <input id="codeInput" placeholder="Enter Access Code">
-  <button onclick="unlock()">Unlock</button>
-</div>
-
-<!-- Terminal Overlay -->
-<div id="terminalOverlay">
-  <div id="terminalOutput"></div>
-  <input id="terminalInput" placeholder="Type command..." onkeydown="handleCommand(event)">
-</div>
+<canvas id="matrix"></canvas>
 
 <script>
-// ================== SECRET UNLOCK ==================
+const gameFolders = [
+"1/","10-minutes-till-dawn/","100ng/","1v1lol/","1v1space/","2020-game/","2048-multitask/","2048/","8ball-billards-classic/","9007199254740992/","DogeMiner/","HexGL/","OfflineParadise/","Stickman-Survival/","achievementunlocked/","adarkroom/","adrenalinechallenge/","age-of-war/","alien-invaders-io/","alienhominid/","align-4/","among-us/","angry-birds/","anti-terrorist-rush/","arcade-wizard/","asciispace/","aspiring-artist/","asteroids/","astray/","avalanche/","awesome-tanks-2/","backcountry/","backflip-dive-3d/","backrooms/","bad-ice-cream-2/","bad-ice-cream-3/","bad-ice-cream/","baldis-basics/","basket-bros-io/","basketball-io/","basketball-legends-2020/","basketball-stars/","battleforgondor/","bigredbutton/","binding-of-isaac/","bitlife/","blacholesquare/","blackholesquare/","blackknight/","blocky-snakes/","bloonstd/","bloonstd2/","bloxors/","bounceback/","boxel-rebound/","boxhead2play/","brave-explorers/","breakingthebank/","breaklock/","breakout/","btd4/","btts/","burning-man-2/","cannon-basketball-4/","canyondefense/","captaincallisto/","cars-simulator/","cell-machine/","championarcher/","chess/","chill-radio/","chromaincident/","chrome-dino/","chromedino/","circlo/","city-blocks-2/","clean-up-io/","cluster-rush/","color-switch-2-challenges/","connect3/","cookie-clicker/","cookieclicker/","core-ball/","craftmine/","creativekillchamber/","crossyroad/","crowd city 2/","csgo-clicker/","ctr-holiday/","ctr-tr/","ctr/","cubefield/","cupcake2048/","cuttherope/","cuttherope2/","dadish/","dadish3/","dadishtwo/","dante/","deal-or-no-deal/","death-run-3d/","death-soul/","deathrun/","defend-the-tank/","dino/","doctor-acorn2/","dodge/","doge-miner-2/","doge-mining-simulator/","doge2048/","dont-drop-the-white-ball-2/","doodle-jump/","doublewires/","douchebag-workout-2/","dragon-vs-bricks/","draw-the-hill/","drive-mad/","duck-life-treasurehunt/","ducklife/","ducklife1/","ducklife2/","ducklife3/","ducklife4/"
+// YOU CAN CONTINUE PASTING THE REST HERE IF NEEDED
+];
 
-function unlock() {
-  const code = document.getElementById("codeInput").value;
+const container = document.getElementById("gameContainer");
 
-  if (code === "shadow1337") {
-    localStorage.setItem("terminalUnlocked", "true");
-    openTerminal();
-  } else {
-    alert("Access Denied");
+function formatTitle(slug) {
+  return slug.replace(/\//g,'')
+             .replace(/-/g,' ')
+             .replace(/\b\w/g, l => l.toUpperCase());
+}
+
+gameFolders.forEach(folder => {
+  const div = document.createElement("div");
+  div.className = "game";
+  div.setAttribute("data-name", folder);
+
+  div.innerHTML = `
+    <h3>${formatTitle(folder)}</h3>
+    <button onclick="openGame('${folder}')">Play</button>
+  `;
+
+  container.appendChild(div);
+});
+
+function openGame(folder){
+  window.open(folder, "_blank");
+}
+
+function searchGames(){
+  let input = document.getElementById("searchBar").value.toLowerCase();
+  let games = document.getElementsByClassName("game");
+  for(let i=0;i<games.length;i++){
+    let name = games[i].getAttribute("data-name").toLowerCase();
+    games[i].style.display = name.includes(input) ? "block" : "none";
   }
 }
 
-function openTerminal() {
-  if (localStorage.getItem("terminalUnlocked") === "true") {
-    document.getElementById("terminalOverlay").style.display = "block";
-    startBootSequence();
-  }
+/* PASSCODE */
+document.getElementById("passInput").addEventListener("keydown",function(e){
+if(e.key==="Enter"){
+if(this.value==="minerdabest"){
+document.getElementById("hackerConsole").style.display="block";
+startMatrix();
+boot();
+}else{
+alert("ACCESS DENIED");
 }
-
-// ================== BOOT SEQUENCE ==================
-
-function startBootSequence() {
-  const output = document.getElementById("terminalOutput");
-  const text = `
-Initializing system...
-Connecting to secure network...
-Bypassing firewall...
-Decrypting credentials...
-ACCESS GRANTED.
-
-Welcome, Agent.
-Type 'help' for commands.
-`;
-
-  let i = 0;
-  output.innerHTML = "";
-
-  function type() {
-    if (i < text.length) {
-      output.innerHTML += text.charAt(i);
-      i++;
-      setTimeout(type, 25);
-    }
-  }
-  type();
 }
+});
 
-// ================== COMMAND SYSTEM ==================
-
-function handleCommand(e) {
-  if (e.key === "Enter") {
-    const input = document.getElementById("terminalInput");
-    const cmd = input.value.trim().toLowerCase();
-    const output = document.getElementById("terminalOutput");
-
-    output.innerHTML += "\n> " + cmd + "\n";
-
-    switch (cmd) {
-      case "help":
-        output.innerHTML += "Commands:\nhelp\nscan\ntrace\nclear\nexit\n";
-        break;
-
-      case "scan":
-        output.innerHTML += "Scanning network...\nIP Found: 192.168.0." + Math.floor(Math.random()*255) + "\n";
-        break;
-
-      case "trace":
-        output.innerHTML += "Tracing signal...\nLocation: UNKNOWN\n";
-        break;
-
-      case "clear":
-        output.innerHTML = "";
-        break;
-
-      case "exit":
-        document.getElementById("terminalOverlay").style.display = "none";
-        break;
-
-      default:
-        output.innerHTML += "Unknown command.\n";
-    }
-
-    output.scrollTop = output.scrollHeight;
-    input.value = "";
-  }
+/* TERMINAL */
+const terminal=document.getElementById("terminal");
+document.getElementById("commandInput").addEventListener("keydown",function(e){
+if(e.key==="Enter"){
+let cmd=this.value;
+terminal.innerHTML+="> "+cmd+"<br>";
+switch(cmd){
+case "help": terminal.innerHTML+="help clear files hack scan ip mine trace<br>"; break;
+case "clear": terminal.innerHTML=""; break;
+case "files": terminal.innerHTML+="root.key<br>wallet.dat<br>admin.log<br>"; break;
+case "hack": terminal.innerHTML+="Firewall bypassed.<br>Access complete.<br>"; break;
+case "scan": terminal.innerHTML+="Scanning... 12 devices found.<br>"; break;
+case "ip": terminal.innerHTML+="IP: 192.168."+Math.floor(Math.random()*255)+"."+Math.floor(Math.random()*255)+"<br>"; break;
+case "mine": terminal.innerHTML+="Mining crypto... "+Math.floor(Math.random()*10000)+" coins<br>"; break;
+case "trace": terminal.innerHTML+="Trace detected... Masked successfully.<br>"; break;
+default: terminal.innerHTML+="Unknown command<br>";
 }
-
-// ================== MATRIX RAIN ==================
-
-const canvas = document.getElementById("matrixCanvas");
-const ctx = canvas.getContext("2d");
-
-canvas.height = window.innerHeight;
-canvas.width = window.innerWidth;
-
-const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const fontSize = 14;
-const columns = canvas.width / fontSize;
-
-const drops = [];
-for (let x = 0; x < columns; x++) {
-  drops[x] = 1;
+this.value="";
 }
+});
 
-function drawMatrix() {
-  ctx.fillStyle = "rgba(0,0,0,0.05)";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  ctx.fillStyle = "lime";
-  ctx.font = fontSize + "px monospace";
-
-  for (let i = 0; i < drops.length; i++) {
-    const text = letters.charAt(Math.floor(Math.random() * letters.length));
-    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975)
-      drops[i] = 0;
-
-    drops[i]++;
-  }
+/* BOOT */
+function boot(){
+terminal.innerHTML+="Initializing system...<br>";
+setTimeout(()=>terminal.innerHTML+="Connecting to darknet...<br>",500);
+setTimeout(()=>terminal.innerHTML+="Access granted.<br>",1000);
 }
-
-setInterval(drawMatrix, 33);
-
-// Resize support
-window.onresize = () => {
-  canvas.height = window.innerHeight;
-  canvas.width = window.innerWidth;
-};
-</script>
-
-</body>
-</html>

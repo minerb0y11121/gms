@@ -89,20 +89,11 @@ button:hover {
   margin: auto;
 }
 
-#matrix {
+canvas {
   position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-}
-
-body > :not(#matrix) {
-  position: relative;
-  z-index: 1;
-}
-
-#hackerConsole {
-  z-index: 2;
+  top: 0;
+  left: 0;
+  z-index: -1;
 }
 </style>
 </head>
@@ -1791,6 +1782,7 @@ function tryPasscodeUnlock() {
     document.getElementById("hackerConsole").style.display = "block";
 
     if (!hasUnlockedConsole) {
+      startMatrix();
       bootSequence();
       hasUnlockedConsole = true;
     }
@@ -1847,51 +1839,42 @@ function bootSequence() {
   setTimeout(() => terminal.innerHTML += "Access granted.<br>", 1000);
 }
 
-// BINARY RAIN BACKGROUND
-let matrixAnimationStarted = false;
-
+// MATRIX EFFECT
 function startMatrix() {
-  if (matrixAnimationStarted) return;
-  matrixAnimationStarted = true;
-
   const canvas = document.getElementById("matrix");
   const ctx = canvas.getContext("2d");
-  const binary = "10101010";
-  const fontSize = 14;
-  const columnWidth = fontSize * binary.length;
-  let drops = [];
 
-  function resizeMatrix() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    const columns = Math.ceil(canvas.width / columnWidth);
-    drops = Array.from({ length: columns }, () => Math.floor(Math.random() * -30));
-  }
+  canvas.height = window.innerHeight;
+  canvas.width = window.innerWidth;
+
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const fontSize = 14;
+  const columns = canvas.width / fontSize;
+  const drops = [];
+
+  for (let x = 0; x < columns; x++)
+    drops[x] = 1;
 
   function draw() {
-    ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "rgba(0,0,0,0.05)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
 
-    ctx.fillStyle = "#00ff00";
+    ctx.fillStyle = "#0F0";
     ctx.font = fontSize + "px monospace";
 
     for (let i = 0; i < drops.length; i++) {
-      ctx.fillText(binary, i * columnWidth, drops[i] * fontSize);
+      const text = letters.charAt(Math.floor(Math.random()*letters.length));
+      ctx.fillText(text, i*fontSize, drops[i]*fontSize);
 
-      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-        drops[i] = Math.floor(Math.random() * -20);
-      }
+      if (drops[i]*fontSize > canvas.height && Math.random() > 0.975)
+        drops[i] = 0;
 
       drops[i]++;
     }
   }
 
-  resizeMatrix();
-  window.addEventListener("resize", resizeMatrix);
   setInterval(draw, 33);
 }
-
-startMatrix();
 </script>
 
 </body>

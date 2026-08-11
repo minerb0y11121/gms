@@ -4,288 +4,105 @@
 <title>GMS Arcade</title>
 
 <style>
-:root {
-  color-scheme: dark;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  background: #030604;
-}
-
 body {
-  min-height: 100vh;
   margin: 0;
-  overflow-x: hidden;
-  background: #030604;
-  color: #f5f5f5;
-  font-family: "Courier New", monospace;
+  background: black;
+  color: white;
+  font-family: monospace;
   text-align: center;
-}
-
-#matrix {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  opacity: 0.72;
-}
-
-body > :not(#matrix) {
-  position: relative;
-  z-index: 1;
-}
-
-.settings-button {
-  position: fixed;
-  top: 28px;
-  left: 20px;
-  z-index: 3;
-  width: 52px;
-  height: 44px;
-  margin: 0;
-  padding: 0;
-  border: 1px solid rgba(63, 68, 80, 0.7);
-  border-radius: 7px;
-  background: rgba(10, 12, 15, 0.88);
-  color: #e7def9;
-  font-size: 23px;
-}
-
-.page-hero {
-  padding: 32px 20px 28px;
-  background: rgba(0, 0, 0, 0.42);
 }
 
 h1 {
-  margin: 0 0 42px;
-  color: #fff;
-  font-size: clamp(28px, 2.4vw, 38px);
-  letter-spacing: 1px;
-  text-shadow: 0 0 14px rgba(0, 255, 36, 0.2);
+  margin-top: 20px;
 }
 
 #searchBar {
-  display: block;
-  width: min(390px, 90vw);
-  margin: 0 auto 42px;
-  padding: 14px 16px;
-  border: 1px solid #ced1d7;
-  border-radius: 8px;
-  outline: none;
-  background: #fff;
-  color: #17191e;
-  font-family: inherit;
-  font-size: 17px;
-}
-
-.featured-card {
-  width: min(282px, 90vw);
-  margin: 0 auto;
-  padding: 25px 22px 20px;
-  border: 1px solid #00d521;
-  border-radius: 14px;
-  background: rgba(11, 12, 23, 0.94);
-  box-shadow: 0 0 24px rgba(0, 255, 30, 0.08);
-}
-
-.featured-icon {
-  margin-bottom: 16px;
-  font-size: 34px;
-}
-
-.featured-card h2 {
-  margin: 0 0 18px;
-  color: #00ee20;
-  font-size: 18px;
-}
-
-.featured-card p {
-  margin: 0 0 20px;
-  color: #b9b9c2;
-  font-size: 13px;
-  line-height: 1.55;
-}
-
-.featured-card a,
-button {
-  display: inline-block;
-  padding: 10px 19px;
-  border: 0;
-  border-radius: 6px;
-  background: #00f11b;
-  color: #001400;
-  font-family: inherit;
+  padding: 10px;
+  width: 300px;
   font-size: 16px;
-  font-weight: bold;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.featured-card a:hover,
-button:hover {
-  background: #39ff58;
-  box-shadow: 0 0 13px rgba(0, 255, 33, 0.45);
-}
-
-.editor-strip {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  margin: 0 12px 28px;
-  padding: 14px 18px;
-  border: 1px solid #313743;
-  border-radius: 14px;
-  background: rgba(25, 28, 35, 0.96);
-  color: #7fa8f7;
-  text-align: left;
-}
-
-.editor-strip .editor-label {
-  font-weight: bold;
-}
-
-.editor-strip .editor-languages {
-  flex: 1;
-  color: #8792a7;
-  font-size: 13px;
-  text-align: center;
-}
-
-.editor-strip button {
-  padding: 6px 13px;
-  background: #2d3851;
-  color: #f4efff;
-  font-size: 14px;
-}
-
-#codeEditor {
-  display: none;
-  width: min(900px, calc(100% - 24px));
-  margin: -15px auto 28px;
-  padding: 18px;
-  border: 1px solid #313743;
-  border-radius: 10px;
-  background: rgba(14, 16, 21, 0.97);
-  color: #8efb9e;
-  text-align: left;
-  white-space: pre-wrap;
+  margin: 20px;
+  border-radius: 5px;
+  border: none;
 }
 
 .games {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 38px 36px;
-  width: min(91%, 1860px);
-  margin: 0 auto 50px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .game {
-  display: flex;
-  min-height: 146px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 31px 18px 20px;
-  border: 1px solid transparent;
+  margin: 15px;
+  padding: 15px;
+  background: #111;
   border-radius: 10px;
-  background: rgba(19, 19, 20, 0.97);
-  box-shadow: 0 9px 20px rgba(0, 0, 0, 0.26);
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  width: 200px;
+  transition: 0.3s;
 }
 
 .game:hover {
-  border-color: #00d521;
-  transform: translateY(-4px);
+  background: #1a1a1a;
+  transform: scale(1.05);
 }
 
-.game h3 {
-  min-height: 42px;
-  margin: 0;
-  color: #f5f5f5;
-  font-size: 16px;
-  line-height: 1.35;
+button {
+  padding: 8px 15px;
+  margin-top: 10px;
+  border: none;
+  background: lime;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 5px;
 }
 
-.game button {
-  margin-top: 14px;
+button:hover {
+  background: #00ff88;
 }
 
 #passInput {
   position: fixed;
-  right: 12px;
-  bottom: 12px;
-  width: 172px;
-  padding: 7px;
-  border: 1px solid #00db25;
-  background: #050905;
-  color: #00ff26;
-  font-family: inherit;
+  bottom: 10px;
+  right: 10px;
+  background: black;
+  color: lime;
+  border: 1px solid lime;
+  padding: 5px;
 }
 
 #hackerConsole {
   display: none;
   position: fixed;
-  inset: 0;
-  z-index: 5;
-  overflow-y: auto;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  color: lime;
   padding: 20px;
-  background: #000;
-  color: #00ff26;
+  overflow-y: auto;
 }
 
 #terminal {
+  text-align: left;
   max-width: 800px;
   margin: auto;
-  text-align: left;
 }
 
-@media (max-width: 1200px) {
-  .games { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-}
-
-@media (max-width: 760px) {
-  .page-hero { padding-top: 92px; }
-  .games { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-  .editor-languages { display: none; }
-  .game { min-height: 135px; padding: 23px 12px 17px; }
-}
-
-@media (max-width: 440px) {
-  .games { grid-template-columns: 1fr; }
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
 }
 </style>
 </head>
 
 <body>
-<canvas id="matrix"></canvas>
 
-<button class="settings-button" type="button" aria-label="Settings">⚙</button>
+<h1>🎮 GMS Arcade</h1>
 
-<section class="page-hero">
-  <h1>🎮 GMS Arcade</h1>
-  <input type="text" id="searchBar" placeholder="Search games..." onkeyup="searchGames()">
-
-  <article class="featured-card">
-    <div class="featured-icon">📌</div>
-    <h2>Bookmarklets</h2>
-    <p>Games &amp; tools you can run on ANY website. Snake, Pong, Ad Blocker &amp; more!</p>
-    <a href="#gameContainer">Open</a>
-  </article>
-</section>
-
-<section class="editor-strip" aria-label="Code Editor">
-  <span class="editor-label">⚙&nbsp; Code Editor</span>
-  <span class="editor-languages">HTML&nbsp; · &nbsp;CSS&nbsp; · &nbsp;JS&nbsp; · &nbsp;Python (Pyodide)</span>
-  <button type="button" onclick="toggleCodeEditor()">Toggle</button>
-</section>
-<pre id="codeEditor">Code editor panel — ready for future tools.</pre>
+<input type="text" id="searchBar" placeholder="Search games..." onkeyup="searchGames()">
 
 <div class="games" id="gameContainer">
   <div class="game" data-name="1">
@@ -1938,6 +1755,8 @@ button:hover {
   <input type="text" id="commandInput" placeholder="Enter command...">
 </div>
 
+<canvas id="matrix"></canvas>
+
 <script>
 function openGame(url) {
   window.location.href = encodeURI(url);
@@ -1954,11 +1773,6 @@ function searchGames() {
 }
 
 
-function toggleCodeEditor() {
-  const editor = document.getElementById("codeEditor");
-  editor.style.display = editor.style.display === "block" ? "none" : "block";
-}
-
 // PASSCODE SYSTEM
 const passInput = document.getElementById("passInput");
 let hasUnlockedConsole = false;
@@ -1968,6 +1782,7 @@ function tryPasscodeUnlock() {
     document.getElementById("hackerConsole").style.display = "block";
 
     if (!hasUnlockedConsole) {
+      startMatrix();
       bootSequence();
       hasUnlockedConsole = true;
     }
@@ -2032,7 +1847,7 @@ function startMatrix() {
   canvas.height = window.innerHeight;
   canvas.width = window.innerWidth;
 
-  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*<>[]{}";
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   const fontSize = 14;
   const columns = canvas.width / fontSize;
   const drops = [];
@@ -2060,8 +1875,6 @@ function startMatrix() {
 
   setInterval(draw, 33);
 }
-
-startMatrix();
 </script>
 
 </body>
